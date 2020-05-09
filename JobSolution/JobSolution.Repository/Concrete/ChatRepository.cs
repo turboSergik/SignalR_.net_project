@@ -10,7 +10,7 @@ namespace JobSolution.Repository.Concrete
     {
         public Task SendMessage(string jwt, int employerId, string message)
         {
-            Console.WriteLine(Context.ConnectionId);
+            Console.WriteLine("========================== " + jwt + " : " + employerId.ToString() + " : " + message);
             return Clients.Group(employerId.ToString()).SendAsync("ReceiveMessage", jwt, message);
         }
 
