@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder} from "@angular/forms";
 import { SignalRService } from "../services/signal-r.service"
 
@@ -9,6 +9,7 @@ import { SignalRService } from "../services/signal-r.service"
 })
 export class ChatComponent implements OnInit {
   closed: boolean = true;
+  @Input() employerId: number;
   conn: SignalRService;
   inputValue;
 
@@ -16,20 +17,16 @@ export class ChatComponent implements OnInit {
     this.inputValue = this.formBuilder.group({
       text: ''
     });
-    this.conn = new SignalRService();
-
   }
 
   ngOnInit(): void {
+    this.conn = new SignalRService(this.employerId);
   }
 
-  connectWithServer(): void {
-
-  }
 
   toggle() {
     if (this.closed === true) {
-      this.conn.startConnection("1")
+      this.conn.startConnection()
     } else {
       this.conn.dropConnection()
     }

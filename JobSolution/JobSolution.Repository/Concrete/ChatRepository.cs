@@ -8,22 +8,22 @@ namespace JobSolution.Repository.Concrete
 {
     public class ChatRepository : Hub
     {
-        public Task SendMessage(string jwt, string message)
+        public Task SendMessage(string jwt, int employerId, string message)
         {
-            Console.WriteLine(Context.UserIdentifier);
-            return Clients.All.SendAsync("ReceiveMessage", jwt, message);
+            Console.WriteLine(Context.ConnectionId);
+            return Clients.Group(employerId.ToString()).SendAsync("ReceiveMessage", jwt, message);
         }
-        public override async Task OnConnectedAsync()
+
+        public Task JoinRoom(int employerId)
         {
-            Console.WriteLine("-------------------------conn");
-            await Groups.AddToGroupAsync(Context.ConnectionId, "SignalR Users");
-            await base.OnConnectedAsync();
+            Console.WriteLine("-------------------------conn" + employerId.ToString());
+            return Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
         }
-        public override async Task OnDisconnectedAsync(Exception exception)
+
+        public Task LeaveRoom(int employerId)
         {
-            Console.WriteLine("-------------------------desc");
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
-            await base.OnDisconnectedAsync(exception);
+            Console.WriteLine("-------------------------desc" + employerId.ToString());
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, employerId.ToString());
         }
     }
 }

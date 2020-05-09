@@ -8,26 +8,33 @@ export class SignalRService {
   public data: ChatMessageModel[];
 
   private hubConnection: signalR.HubConnection
+  private employerId: number;
 
-  public startConnection = (hubId) => {
+  constructor(employerId: number) {
+    this.employerId = employerId
+  }
+
+  public startConnection(): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(HOST_CHAT + '/' + hubId)
+      .withUrl(HOST_CHAT)
       .build();
 
     this.hubConnection
       .start()
       .then(() => {
-        this.hubConnection.invoke('SendMessage', localStorage.getItem('accessToken'), 'lol')
+        console.log("Kke", this.employerId);
+        this.hubConnection.invoke('JoinRoom', this.employerId)
       })
       .catch(err => console.log(err))
-
-    this.hubConnection.on('ReceiveMessage', (data) => {
-      console.log(data);
-    });
   }
 
   public dropConnection(): void {
-    this.hubConnection.stop();
+    this.hubConnection.invoke('LeaveRoom', this.employerId)
+    this.hubConnection.stop()
+  }
+
+  public sendMessage(message: string): void {
+    this.hubConnection.invoke('SendMessage', localStorage.get('accessToken'), this.employerId, message)
   }
 
   public addTransferChartDataListener = () => {
