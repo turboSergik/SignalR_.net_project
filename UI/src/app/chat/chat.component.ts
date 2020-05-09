@@ -9,17 +9,18 @@ import { SignalRService } from "../services/signal-r.service"
 })
 export class ChatComponent implements OnInit {
   closed: boolean = true;
+  conn: SignalRService;
   inputValue;
 
   constructor(private formBuilder: FormBuilder) {
     this.inputValue = this.formBuilder.group({
       text: ''
     });
+    this.conn = new SignalRService();
+
   }
 
   ngOnInit(): void {
-    const conn = new SignalRService();
-    conn.startConnection("");
   }
 
   connectWithServer(): void {
@@ -27,6 +28,12 @@ export class ChatComponent implements OnInit {
   }
 
   toggle() {
+    if (this.closed === true) {
+      this.conn.startConnection("1")
+    } else {
+      this.conn.dropConnection()
+    }
+
     return this.closed = !this.closed
   }
 
