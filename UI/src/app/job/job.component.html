@@ -1,0 +1,38 @@
+<mat-list class="container">
+  <div class="jobs-container" matSort>
+    <app-job-filter (onFiltered)="onFiltered($event)"></app-job-filter>
+
+    <div class="jobs-results">
+      <div class="jop-post" *ngFor="let job of allJobs">
+        <mat-card class="mat-elevation-z3">
+          <mat-card-title-group class="card-header__container">
+            <mat-card-title>{{job.title}}</mat-card-title>
+            <mat-card-subtitle>{{job.category}}</mat-card-subtitle>
+          </mat-card-title-group>
+          <mat-card-header>
+            <img mat-card-lg-image src="{{job.base64Photo}}" alt="post_image">
+            <mat-card-subtitle>{{job.contact}}</mat-card-subtitle>
+            <mat-card-subtitle>{{job.city}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+            <button mat-icon-button color="warn" class="action__button">
+              <mat-icon>delete</mat-icon>
+            </button>
+<!--            <button mat-icon-button color="primary" class="action__button">-->
+<!--              <mat-icon>edit</mat-icon>-->
+<!--            </button>-->
+            <button mat-icon-button color="accent" class="action__button">
+              <mat-icon>favorite</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <mat-paginator
+    [length]="100"
+    [pageSize]="10"
+    [pageSizeOptions]="this.pageOptions">
+  </mat-paginator>
+</mat-list>

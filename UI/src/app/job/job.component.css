@@ -1,0 +1,53 @@
+.image {
+    width: 100px;
+}
+
+.container {
+    max-width: 95%;
+    margin: auto;
+}
+
+.container__element {
+    margin: 10px 0;
+}
+
+.card-header__container {
+    margin-left: 20px;
+}
+
+.mat-card-header {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.action__button {
+    margin: 0 10px;
+}
+
+.jop-post {
+  width: 33.33%;
+  float: left;
+  box-sizing: border-box;
+  padding: 15px;
+}
+
+.jobs-results {
+  display: inline-block;
+}
+
+.jop-post:nth-child(3n+1) {
+  padding-left: 0;
+}
+
+.jop-post:nth-child(3n) {
+  padding-right: 0;
+}
+
+.category{
+  padding: 10px;
+}
+
+.field_length{
+  width: 80%;
+  position: center;
+}

@@ -1,0 +1,65 @@
+<mat-card class="register-component">
+  <div fxLayout="row | wrap" fxLayoutAlign="center center">
+    <div class="container">
+      <h1>Create your Account</h1>
+      <form (ngSubmit)="onSubmit()" #RegisterForm="ngForm">
+        <div>
+          <mat-form-field >
+            <mat-label>First Name</mat-label>
+            <input matInput type="text" name="FirstName"
+                   [(ngModel)]="registeredUser.FirstName"
+                   placeholder="Insert your FirstName" required/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field >
+            <mat-label>Last Name</mat-label>
+            <input matInput placeholder="Insert your LastName"
+                   [(ngModel)]="registeredUser.LastName"
+                   pattern="[A-Za-z]+"
+                   name="lastname"
+                   required/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field >
+            <mat-label>Email</mat-label>
+            <input matInput name="email"
+                   [(ngModel)]="registeredUser.Email"
+                   required/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <mat-label>Username</mat-label>
+            <input matInput name="UserName"
+                   [(ngModel)]="registeredUser.UserName"
+                   required/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <mat-label>Password</mat-label>
+            <input matInput type="password" [(ngModel)]="registeredUser.Password"
+                   minlength="5" required/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <mat-label>Role</mat-label>
+            <mat-select
+              [(ngModel)]="registeredUser.RoleFromRegister" required>
+              <mat-option *ngFor="let role of roles" [value]="role">
+                {{role}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <button type="submit" mat-raised-button color="primary"
+                [disabled]="RegisterForm.invalid">
+          Register
+        </button>
+      </form>
+    </div>
+  </div>
+</mat-card>

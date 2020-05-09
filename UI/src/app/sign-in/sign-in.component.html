@@ -1,0 +1,36 @@
+<mat-card class="login-component">
+  <div fxLayout="row | wrap" fxLayoutAlign="center center">
+    <div class="container">
+      <h1>Log into your Account</h1>
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <table class="example-full-width">
+          <tr>
+            <td>
+              <div class="form-group">
+                <mat-form-field >
+                  <input [(ngModel)]="userName"  matInput
+                         name="userName"
+                         placeholder="Username" required>
+                </mat-form-field>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="form-group">
+                <mat-form-field>
+                  <input [(ngModel)]="password" matInput
+                         name="password"
+                         placeholder="Password" type="password" required>
+                </mat-form-field>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <button type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">
+          LOG IN
+        </button>
+      </form>
+    </div>
+  </div>
+</mat-card>

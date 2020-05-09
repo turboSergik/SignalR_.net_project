@@ -1,0 +1,24 @@
+.mat-drawer {
+  width: 10%;
+  background: #6a1b9a;
+  box-shadow:
+    0 4px 5px -2px rgba(0, 0, 0, 0.2),
+    0 7px 10px 1px rgba(0, 0, 0, 0.14),
+    0 2px 16px 1px rgba(0, 0, 0, 0.12);
+}
+
+.app-main-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.main-content {
+  padding: 25px;
+}
+
+.user-options {
+  position: absolute;
+  right: 0;
+}

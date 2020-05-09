@@ -1,0 +1,31 @@
+<section class="mat-typography">
+  <div class="container">
+    <h1 class="main-heading">
+      Find your dream jobs
+    </h1>
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="exemple-full-width">
+        <input matInput placeholder="Search your job..." [matAutocomplete]="auto" [formControl]="searchControl">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of filteredOptions | async"
+                      (click)="this.onViewJob(option.jobId)"
+                      [value]="option.title">
+            {{option.title}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+    <div class="jobs-types" *ngFor="let type of jobTypes">
+      <div class="jop-post-type">
+        <mat-card >
+          <mat-card-title>{{type.name}}</mat-card-title>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+            Ab animi atque delectus distinctio doloremque eos eum. </p>
+          <button mat-raised-button color="accent" [routerLink]="'/jobs/' + type.id">View all Jobs</button>
+        </mat-card>
+      </div>
+      <app-chat></app-chat>
+    </div>
+  </div>
+</section>
+

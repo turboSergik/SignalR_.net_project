@@ -1,0 +1,27 @@
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Title</mat-label>
+    <input [(ngModel)]="this.advert.title" required matInput>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Category</mat-label>
+    <mat-select [(ngModel)]="this.advert.categoryId" required>
+      <mat-option *ngFor="let category of categories" [value]="category.id">
+        {{category.category}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>City</mat-label>
+    <mat-select [(ngModel)]="this.advert.cityId" required>
+      <mat-option *ngFor="let city of cities" [value]="city.id">
+        {{city.city}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Contact</mat-label>
+    <input [(ngModel)]="this.advert.contact" matInput>
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="AddAdvert(this.advert)">ADD ADVERT</button>
+</div>

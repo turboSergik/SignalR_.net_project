@@ -1,0 +1,16 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:5000",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "JobSolution.API": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:5000"
+    }
+  }
+}
