@@ -116,7 +116,7 @@ namespace JobSolution.API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatRepository>("/work/{id}");
+                endpoints.MapHub<ChatRepository>("/work");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"
