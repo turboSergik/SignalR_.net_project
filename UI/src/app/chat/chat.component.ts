@@ -1,22 +1,23 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder} from "@angular/forms";
 import { SignalRService } from "../services/signal-r.service"
 import {ChatMessageModel} from '../Interfaces/ChatMessageModel';
+import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   closed: boolean = true;
-  @Input() employerId: number;
 
-  receivedMessages: [{ jwtToken: '', message: "kek" }];
+  public receivedMessages: ChatMessageModel[] = [];
   conn: SignalRService;
   inputValue;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder,
+              @Inject(MAT_DIALOG_DATA) public employerId: number) {
     this.inputValue = this.formBuilder.group({
       text: ''
     });
@@ -24,20 +25,14 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
     this.conn = new SignalRService(this.employerId);
+    this.conn.startConnection()
+    this.conn.onMessageReceived(([ username, employer, message ]) => {
+      this.receivedMessages.push({ username, employer, message })
+    })
   }
 
-  toggle() {
-    if (this.closed === true) {
-      this.conn.startConnection()
-      this.conn.onMessageReceived((data) => {
-        console.log(data);
-        this.receivedMessages.push({ jwtToken: null, message: data[1] })
-      })
-    } else {
-      this.conn.dropConnection()
-    }
-
-    return this.closed = !this.closed
+  ngOnDestroy(): void {
+    this.conn.dropConnection()
   }
 
   onSubmit(value) {

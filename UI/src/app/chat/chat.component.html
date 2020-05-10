@@ -1,23 +1,21 @@
 <div class="chat">
-  <mat-card class="chat__box" [ngClass]="closed ? 'closed' : ''">
-    <mat-card-title (click)="toggle()" style="cursor: pointer">Chat</mat-card-title>
-    <mat-card-content class="card__box-items">
-      <mat-card class="card__box-item" *ngFor="let job of receivedMessages">
-        <mat-card-header>
-          <img mat-card-avatar src="https://img.icons8.com/material/4ac144/256/user-male.png">
-          <mat-card-title>BOTNAME</mat-card-title>
-          <mat-card-subtitle>Simple Chat bot</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          {{ job.message }}
-        </mat-card-content>
-      </mat-card>
-    </mat-card-content>
-    <form [formGroup]="inputValue" class="cart__box-input" (ngSubmit)="onSubmit(inputValue.value)">
-      <mat-form-field style="width: 100%">
-        <mat-label>Chat with your bot</mat-label>
-        <input matInput placeholder="Okey" formControlName="text">
-      </mat-form-field>
-    </form>
-  </mat-card>
+  <mat-card-title style="cursor: pointer">Chat</mat-card-title>
+  <mat-card-content class="card__box-items">
+    <mat-card class="card__box-item" *ngFor="let message of receivedMessages">
+      <mat-card-header>
+        <img mat-card-avatar [src]="message.employer ? 'https://img.icons8.com/ios-filled/344/security-user-male.png' : 'https://img.icons8.com/ios/344/security-user-male.png'">
+        <mat-card-title>{{ message.username }}</mat-card-title>
+        <mat-card-subtitle>{{ message.employer ? "Employer" : "Worker" }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        {{ message.message }}
+      </mat-card-content>
+    </mat-card>
+  </mat-card-content>
+  <form [formGroup]="inputValue" class="cart__box-input" (ngSubmit)="onSubmit(inputValue.value)">
+    <mat-form-field style="width: 100%">
+      <mat-label>Chat with your bot</mat-label>
+      <input matInput placeholder="Okey" formControlName="text">
+    </mat-form-field>
+  </form>
 </div>

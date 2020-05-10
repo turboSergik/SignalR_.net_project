@@ -1,4 +1,5 @@
 export interface ChatMessageModel {
-  jwtToken: string;
+  username: string;
+  employer: boolean;
   message: string;
 }

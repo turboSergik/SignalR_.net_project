@@ -5,8 +5,6 @@ import { ChatMessageModel } from '../Interfaces/ChatMessageModel'
 const HOST_CHAT = 'http://localhost:5000/work'
 
 export class SignalRService {
-  public data: ChatMessageModel[];
-
   private hubConnection: signalR.HubConnection
   private readonly employerId: number;
 

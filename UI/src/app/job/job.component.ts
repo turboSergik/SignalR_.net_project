@@ -7,6 +7,8 @@ import {PaginatedRequest} from '../_models/PaginatedRequest';
 import {ActivatedRoute, Params} from '@angular/router';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {MatDialog} from '@angular/material/dialog';
+import {ChatComponent} from '../chat/chat.component';
 
 
 @Component({
@@ -22,7 +24,8 @@ export class JobComponent implements OnInit {
   allJobs: JobDTO[];
 
 
-  constructor(private jobService: JobService,
+  constructor(public dialog: MatDialog,
+              private jobService: JobService,
               private toolBarService: ToolBarService,
               route: ActivatedRoute) {
     route.params.subscribe((params: Params) => {
@@ -50,6 +53,14 @@ export class JobComponent implements OnInit {
   loadJobs() {
     this.jobService.getAllJobPaginated(this.filter).subscribe(data => {
       this.allJobs = data.items;
+    });
+  }
+
+  openChat(jobId: number): void {
+    const dialogRef = this.dialog.open(ChatComponent, {
+      width: '600px',
+      height: '500px',
+      data: jobId
     });
   }
 }
