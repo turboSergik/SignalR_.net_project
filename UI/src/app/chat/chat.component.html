@@ -2,84 +2,14 @@
   <mat-card class="chat__box" [ngClass]="closed ? 'closed' : ''">
     <mat-card-title (click)="toggle()" style="cursor: pointer">Chat</mat-card-title>
     <mat-card-content class="card__box-items">
-      <mat-card class="card__box-item">
+      <mat-card class="card__box-item" *ngFor="let job of receivedMessages">
         <mat-card-header>
           <img mat-card-avatar src="https://img.icons8.com/material/4ac144/256/user-male.png">
           <mat-card-title>BOTNAME</mat-card-title>
           <mat-card-subtitle>Simple Chat bot</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          Hello, how a u?
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="card__box-item">
-        <mat-card-header>
-          <img mat-card-avatar src="https://lh3.googleusercontent.com/proxy/JJgsAIE6D6uLbnNoyQLrFkbT2c7Ec05nvSbdCzcL8b8NIunAVwkCLuV3rN3eXHro4iLP4RtT0qzpZVh6ffmq9mcOhjRjbSL8y1ItWsPy">
-          <mat-card-title>USERNAME</mat-card-title>
-          <mat-card-subtitle>.NET Developer (may be)</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          Gimme a list of available vacancies suitable for me
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="card__box-item">
-        <mat-card-header>
-          <img mat-card-avatar src="https://img.icons8.com/material/4ac144/256/user-male.png">
-          <mat-card-title>BOTNAME</mat-card-title>
-          <mat-card-subtitle>Simple Chat bot</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-card class="card__box-item">
-            <mat-card-header>
-              <img mat-card-avatar src="https://previews.123rf.com/images/sunnysmilestock/sunnysmilestock1609/sunnysmilestock160900220/63204055-don-t-wish-for-it-work-for-it-poster-with-hand-drawn-lettering-vector-illustration-Stock-Photo.jpg">
-              <mat-card-title>.NET Developer</mat-card-title>
-              <mat-card-subtitle style="margin-bottom: 0;">Salary 500-600$ per mounth</mat-card-subtitle>
-            </mat-card-header>
-          </mat-card>
-          <mat-card class="card__box-item">
-            <mat-card-header>
-              <img mat-card-avatar src="https://previews.123rf.com/images/sunnysmilestock/sunnysmilestock1609/sunnysmilestock160900220/63204055-don-t-wish-for-it-work-for-it-poster-with-hand-drawn-lettering-vector-illustration-Stock-Photo.jpg">
-              <mat-card-title>.NET Developer</mat-card-title>
-              <mat-card-subtitle style="margin-bottom: 0;">Salary 500-600$ per mounth</mat-card-subtitle>
-            </mat-card-header>
-          </mat-card>
-          <mat-card class="card__box-item">
-            <mat-card-header>
-              <img mat-card-avatar src="https://previews.123rf.com/images/sunnysmilestock/sunnysmilestock1609/sunnysmilestock160900220/63204055-don-t-wish-for-it-work-for-it-poster-with-hand-drawn-lettering-vector-illustration-Stock-Photo.jpg">
-              <mat-card-title>.NET Developer</mat-card-title>
-              <mat-card-subtitle style="margin-bottom: 0;">Salary 500-600$ per mounth</mat-card-subtitle>
-            </mat-card-header>
-          </mat-card>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="card__box-item">
-        <mat-card-header>
-          <img mat-card-avatar src="https://lh3.googleusercontent.com/proxy/JJgsAIE6D6uLbnNoyQLrFkbT2c7Ec05nvSbdCzcL8b8NIunAVwkCLuV3rN3eXHro4iLP4RtT0qzpZVh6ffmq9mcOhjRjbSL8y1ItWsPy">
-          <mat-card-title>USERNAME</mat-card-title>
-          <mat-card-subtitle>.NET Developer (may be)</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          thx
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="card__box-item">
-        <mat-card-header>
-          <img mat-card-avatar src="https://img.icons8.com/material/4ac144/256/user-male.png">
-          <mat-card-title>BOTNAME</mat-card-title>
-          <mat-card-subtitle>Simple Chat bot</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          kek
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="card__box-item">
-        <mat-card-header>
-          <img mat-card-avatar src="https://lh3.googleusercontent.com/proxy/JJgsAIE6D6uLbnNoyQLrFkbT2c7Ec05nvSbdCzcL8b8NIunAVwkCLuV3rN3eXHro4iLP4RtT0qzpZVh6ffmq9mcOhjRjbSL8y1ItWsPy">
-          <mat-card-title>USERNAME</mat-card-title>
-          <mat-card-subtitle>.NET Developer (may be)</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          kek
+          {{ job.message }}
         </mat-card-content>
       </mat-card>
     </mat-card-content>

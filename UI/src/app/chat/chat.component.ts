@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder} from "@angular/forms";
 import { SignalRService } from "../services/signal-r.service"
+import {ChatMessageModel} from '../Interfaces/ChatMessageModel';
 
 @Component({
   selector: 'app-chat',
@@ -10,6 +11,8 @@ import { SignalRService } from "../services/signal-r.service"
 export class ChatComponent implements OnInit {
   closed: boolean = true;
   @Input() employerId: number;
+
+  receivedMessages: [{ jwtToken: '', message: "kek" }];
   conn: SignalRService;
   inputValue;
 
@@ -23,10 +26,13 @@ export class ChatComponent implements OnInit {
     this.conn = new SignalRService(this.employerId);
   }
 
-
   toggle() {
     if (this.closed === true) {
       this.conn.startConnection()
+      this.conn.onMessageReceived((data) => {
+        console.log(data);
+        this.receivedMessages.push({ jwtToken: null, message: data[1] })
+      })
     } else {
       this.conn.dropConnection()
     }
@@ -35,6 +41,7 @@ export class ChatComponent implements OnInit {
   }
 
   onSubmit(value) {
+    this.conn.sendMessage(value.text)
     this.inputValue.reset()
   }
 }
