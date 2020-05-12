@@ -11,5 +11,7 @@ namespace JobSolution.Repository.Interfaces
     {
         Task Add(int UserId, int jobId);
         Task Delete (int UserId ,int jobId);
+        Task<IQueryable<StudentJobs>> GetAll(int UserId);
+        Task<IList<int>> GetStudentJobs(int UserId);
     }
 }

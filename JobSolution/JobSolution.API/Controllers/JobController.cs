@@ -32,15 +32,21 @@ namespace JobSolution.API.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ICityService _cityService;
         private readonly ITypeJobService _typeJobService;
+        private readonly IStudentJobService _studentJobService;
         private readonly IMapper _mapper;
 
-        public JobController(IJobService repositoryJob,ICategoryService categoryService, ICityService cityService, ITypeJobService typeJobService, IMapper mapper)
+        public JobController(IJobService repositoryJob,ICategoryService categoryService, 
+            ICityService cityService, 
+            ITypeJobService typeJobService,
+            IStudentJobService studentJobService,
+            IMapper mapper)
         {
             _cityService = cityService;
             _categoryService = categoryService;
             _jobService = repositoryJob;
             _mapper = mapper;
             _typeJobService = typeJobService;
+            _studentJobService = studentJobService;
         }
 
         [HttpGet("Categories")]
@@ -95,7 +101,7 @@ namespace JobSolution.API.Controllers
 
         [HttpPost("Post")]
         [Authorize(Roles = "Employer")]
-        public async Task<IActionResult> Postt()
+        public async Task<IActionResult> Post()
         {
             if (ModelState.IsValid)
             {
@@ -122,7 +128,7 @@ namespace JobSolution.API.Controllers
             if (ModelState.IsValid)
             {
                 await _jobService.Update(id);
-                return Ok("Saved");
+                return Ok();
             }
             return BadRequest();
         }
@@ -159,5 +165,23 @@ namespace JobSolution.API.Controllers
 
             return Ok(result);
         }
+
+
+        [HttpGet("Added/{jobId}")]
+        [Authorize(Roles ="Student")]
+        public async Task<IActionResult> AddedJobStudent([FromRoute]int jobId)
+        {
+            await  _jobService.AddedJobByStudent(jobId);
+            return Ok();
+        }
+
+        [HttpDelete("Student/Delete/{jobId}")]
+        [Authorize(Roles ="Student")]
+        public async Task<IActionResult> DeleteStudentJobs(int jobId)
+        {
+             await _jobService.DeleteJobStudent(jobId);
+            return Ok();
+        }
+
     }
 }

@@ -8,5 +8,6 @@ namespace JobSolution.Domain.Auth
     {
         public virtual Profile Profile{ get; set; }
         public virtual ICollection<Job> Jobs { get; set; }
+        public virtual ICollection<StudentJobs> StudentJobs { get; set; }
     }
 }

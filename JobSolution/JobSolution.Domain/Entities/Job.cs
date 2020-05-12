@@ -26,7 +26,6 @@ namespace JobSolution.Domain.Entities
         [ForeignKey("TypeJob")]
         public int TypeJobId { get; set; }
         public TypeJob TypeJob { get; set; }
-        public bool Marked { get; set; }
-
+        public virtual ICollection<StudentJobs> StudentJobs { get; set; }
     }
 }

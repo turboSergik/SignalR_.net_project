@@ -5,7 +5,6 @@ using JobSolution.Domain.Entities;
 using JobSolution.Infrastructure.Configuration;
 using JobSolution.Infrastructure.Database;
 using JobSolution.Repository.Interfaces;
-using JobSolution.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,7 +22,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JobSolution.Services.Concrete
+namespace JobSolution.Services.Interfaces
 {
     public class AuthService : IAuthService
     {
@@ -36,27 +35,29 @@ namespace JobSolution.Services.Concrete
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _context;
         private readonly IHostingEnvironment _hostingEnvironment;
+
         public AuthService(AppDbContext dbContext, IAuthRepository authRepository, IOptions<AuthOptions> authOption, SignInManager<User> signInManager, 
-            UserManager<User> userManager,IHttpContextAccessor context, IHostingEnvironment hostingEnvironment)
+            UserManager<User> userManager, IHttpContextAccessor context, IHostingEnvironment hostingEnvironment)
         {
             _authRepository = authRepository;
             _authOptions = authOption.Value;
             _signInManager = signInManager;
             _userManager = userManager;
             _dbContext = dbContext;
+
             _context = context;
             _hostingEnvironment = hostingEnvironment;
         } 
-
         public async Task<IActionResult> AddUser()
         {
-            UserRegisterDto registerUser = null;
-            
+            UserRegisterDto userRegisterDto = new UserRegisterDto();
+            JobSolution.Domain.Entities.Profile userProfile = new Domain.Entities.Profile();
             try
             {
                 foreach (var key in _context.HttpContext.Request.Form.Keys)
                 {
-                    registerUser = JsonConvert.DeserializeObject<UserRegisterDto>(_context.HttpContext.Request.Form[key]);
+                    userRegisterDto = JsonConvert.DeserializeObject<UserRegisterDto>(_context.HttpContext.Request.Form[key]);
+            
                     var file = _context.HttpContext.Request.Form.Files.Count > 0 ? _context.HttpContext.Request.Form.Files[0] : null;
                     if (file != null)
                     {
@@ -77,7 +78,7 @@ namespace JobSolution.Services.Concrete
                         {
                             string fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                             string fullPath = Path.Combine(newPath, fileName);
-                            registerUser.ImagePath = fullPath;
+                            userProfile.ImagePath = fullPath;
                             using (var stream = new FileStream(fullPath, FileMode.Create))
                             {
                                 file.CopyTo(stream);
@@ -91,52 +92,95 @@ namespace JobSolution.Services.Concrete
 
             }
 
-
-            if(registerUser == null)
+            if(userRegisterDto == null)
             {
-
                 return new StatusCodeResult(500);
             }
 
-            var user = await _userManager.FindByNameAsync(registerUser.UserName);
-            if(user != null)
+            var findExistedProfile = await _userManager.FindByEmailAsync(userRegisterDto.Email);
+            if (findExistedProfile != null)
             {
-
-                return new BadRequestObjectResult ("Username or email exists");
+                return new BadRequestObjectResult("Email or username exist!");
             }
 
+            var CreateUserToAdd = new User()
+            {
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = userRegisterDto.UserName,
+                Email = userRegisterDto.Email
+            };
 
+
+            await _userManager.CreateAsync(CreateUserToAdd, userRegisterDto.Password);
+            await _userManager.AddToRoleAsync(CreateUserToAdd, userRegisterDto.RoleFromRegister);
             var AddUser = new User()
             {
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = registerUser.UserName,
-                Email = registerUser.Email
+                UserName = userRegisterDto.UserName,
+                Email = userRegisterDto.Email
+            };
+            var Profile = new JobSolution.Domain.Entities.Profile
+            {
+
+                FirstName = userRegisterDto.FirstName,
+                LastName = userRegisterDto.LastName,
+                Email = userRegisterDto.Email,
+                PhoneNumber = userRegisterDto.PhoneNumber,
+                University = userRegisterDto.University,
+                UserId = _userManager.FindByEmailAsync(AddUser.Email).Result.Id,
+
             };
 
-            await _userManager.CreateAsync(AddUser, registerUser.Password);
-            await _userManager.AddToRoleAsync(AddUser, registerUser.RoleFromRegister);
-
-            _dbContext.Profiles.Add(_mapper.Map<JobSolution.Domain.Entities.Profile>(registerUser));
+            _dbContext.Profiles.Add(Profile);
             _dbContext.SaveChanges();
 
-
-            var signInCredentials = new SigningCredentials(_authOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
+            var signinCredentials = new SigningCredentials(_authOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
             var jwtSecurityToken = new JwtSecurityToken(
                  issuer: _authOptions.Issuer,
                  audience: _authOptions.Audience,
-                 claims: new List<Claim>() { new Claim(ClaimTypes.Role, registerUser.RoleFromRegister), new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) },
+                 claims: new List<Claim>() { new Claim(ClaimTypes.Role, userRegisterDto.RoleFromRegister), new Claim(ClaimTypes.NameIdentifier, Profile.UserId.ToString()) },
                  expires: DateTime.Now.AddDays(30),
-                 signingCredentials: signInCredentials);
+                 signingCredentials: signinCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
             var encodedToken = tokenHandler.WriteToken(jwtSecurityToken);
 
-            return new OkObjectResult(new { AccessToken = encodedToken });
+
+
+            return  new OkObjectResult(new { AccessToken = encodedToken });
 
         }
 
-        public Task<IActionResult> GetToken()
+        public async Task<IActionResult> GetToken(UserForLoginDto userLoginDto)
         {
-            throw new NotImplementedException();
+            var checkPassword = await _signInManager.PasswordSignInAsync(userLoginDto.Username, userLoginDto.Password, false, false);
+            var user = await _userManager.FindByNameAsync(userLoginDto.Username);
+            var role = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>();
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            claims.Add(new Claim("UserId", user.Id.ToString()));
+
+            foreach (var item in role)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, item));
+            }
+
+
+            if (checkPassword.Succeeded)
+            {
+                var signinCredentials = new SigningCredentials(_authOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
+                var jwtSecurityToken = new JwtSecurityToken(
+                     issuer: _authOptions.Issuer,
+                     audience: _authOptions.Audience,
+                     claims: claims,
+                     expires: DateTime.Now.AddDays(30),
+                     signingCredentials: signinCredentials);
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var encodedToken = tokenHandler.WriteToken(jwtSecurityToken);
+                return  new OkObjectResult(new { AccessToken = encodedToken });
+            }
+            return new UnauthorizedResult();
         }
     }
 }

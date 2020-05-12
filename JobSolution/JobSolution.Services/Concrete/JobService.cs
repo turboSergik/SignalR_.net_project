@@ -23,14 +23,18 @@ namespace JobSolution.Services.Concrete
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _context;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IStudentJobService _studentJobService;
 
-
-        public JobService(IJobRepository jobRepository, IMapper mapper, IHttpContextAccessor context, IHostingEnvironment hostingEnvironment)
+        public JobService(IJobRepository jobRepository, 
+            IMapper mapper, IHttpContextAccessor context, 
+            IHostingEnvironment hostingEnvironment,
+            IStudentJobService studentJobService)
         {
             _jobRepository = jobRepository;
             _mapper = mapper;
             _context = context;
             _hostingEnvironment = hostingEnvironment;
+            _studentJobService = studentJobService;
         }
 
         public async Task Add()
@@ -214,6 +218,8 @@ namespace JobSolution.Services.Concrete
         public async Task<PaginatedResult<JobDTO>> GetJobsForStudent(PagedRequest pagedRequest, IMapper mapper)
         {
             var UserId = Convert.ToInt32(_context.HttpContext.User.Claims.Where(x => x.Type == "UserId").First().Value);
+            var ListJobsForStudents = _studentJobService.GetListId();
+
             var result = await _jobRepository.GetPagedDataStudent(pagedRequest, mapper, UserId);
             return result;
         }
@@ -223,9 +229,9 @@ namespace JobSolution.Services.Concrete
             var AllJobs = await _jobRepository.GetAllJobs();
 
 
-            var JobsListDTO = AllJobs.Where(x=>x.TypeJobId==TypeId);
+            var JobsList = AllJobs.Where(x=>x.TypeJobId==TypeId);
 
-            var result = _mapper.Map<IQueryable<Job>, IList<JobDTO>>(JobsListDTO);
+            var result = _mapper.Map<IQueryable<Job>, IList<JobDTO>>(JobsList);
 
             return result;
         }
@@ -236,13 +242,16 @@ namespace JobSolution.Services.Concrete
             return result;
         }
 
-        public async Task Subscribe(int JobId)
+        
+
+        public async Task AddedJobByStudent(int id)
         {
-            var UserId = Convert.ToInt32(_context.HttpContext.User.Claims.Where(x => x.Type == "UserId").First().Value);
-            var Alljobs = await _jobRepository.GetAllJobs();
-            var job = Alljobs.Where(x => x.UserId == UserId && x.Id == JobId).FirstOrDefault();
-            var temp = job.Marked;
-            job.Marked = true ? false : true;
+            await _studentJobService.Add(id);
+        }
+
+        public async Task DeleteJobStudent(int id)
+        {
+            await _studentJobService.Delete(id);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace JobSolution.API.Controllers
             {
                 await _advertService.Add(advertDTO);
 
-                return Ok();
+                return Ok();    
             }
 
             return BadRequest();

@@ -10,8 +10,8 @@ namespace JobSolution.Services.Interfaces
 {
     public interface IProfileService
     {
-        Task<StudentProfileDTO> GetAuthStudentProfile();
-        Task<EmployerProfileDTO> GetAuthEmployerPofiles();
+        Task<ProfileDTO> GetAuthProfile();
+        
 
     }
 }

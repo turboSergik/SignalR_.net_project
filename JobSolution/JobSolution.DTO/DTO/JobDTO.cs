@@ -24,6 +24,5 @@ namespace JobSolution.DTO.DTO
         public float Salary { get; set; }
         public string Description { get; set; }
         public string TypeJob { get; set; }
-        public bool Marked { get; set; }
     }
 }

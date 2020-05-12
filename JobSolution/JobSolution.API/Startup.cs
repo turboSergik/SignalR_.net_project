@@ -1,19 +1,34 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using JobSolution.Services.Concrete;
 using JobSolution.Services.Interfaces;
 using JobSolution.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using JobSolution.Domain;
+using JobSolution.Infrastructure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using JobSolution.Domain.Auth;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using JobSolution.Infrastructure.Extensions;
+using JobSolution.Repository;
 using JobSolution.Repository.Interfaces;
 using JobSolution.Repository.Concrete;
+using JobSolution.Infrastructure.Seed;
 
 namespace JobSolution.API
 {
@@ -28,13 +43,7 @@ namespace JobSolution.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSignalR();
-            services.AddCors(options => options.AddPolicy("Cors", builder => {
-                builder.AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .WithOrigins("http://localhost:4200")
-                       .AllowCredentials();
-            }));
+            services.AddCors(options => options.AddPolicy("Cors", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1",
@@ -46,9 +55,7 @@ namespace JobSolution.API
             });
 
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-            
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
             services.AddTransient<IJobRepository, JobRepository>();
             services.AddTransient<IJobService, JobService>();
             services.AddTransient<IProfileRepository, ProfileRepository>();
@@ -64,6 +71,10 @@ namespace JobSolution.API
 
             services.AddTransient<IAuthRepository, AuthRepository>();
             services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IStudentJobService, StudentJobService>();
+            services.AddTransient<IStudentJobRepository, StudentJobRepository>();
+
+
 
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -103,12 +114,11 @@ namespace JobSolution.API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatRepository>("/work");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"
-                );
-
+                 );
+               ;
             });
 
 

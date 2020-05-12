@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using JobSolution.Domain;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace JobSolution.Services.Interfaces
@@ -6,6 +7,6 @@ namespace JobSolution.Services.Interfaces
     public interface IAuthService
     {
         Task<IActionResult> AddUser();
-        Task<IActionResult> GetToken();
+        Task<IActionResult> GetToken(UserForLoginDto userLoginDto);
     }
 }

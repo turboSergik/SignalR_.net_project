@@ -20,33 +20,22 @@ namespace JobSolution.API.Controllers
     {
         private readonly IProfileService _userService;
         private readonly IJobService _jobService;
-        public UserController(IProfileService userService, IJobService jobService)
+        private readonly IStudentJobService _studentJobService;
+        public UserController(IProfileService userService, 
+            IJobService jobService,
+            IStudentJobService studentJobService
+            )
         {
             _userService = userService;
             _jobService = jobService;
+            _studentJobService = studentJobService;
         }
 
-        [HttpGet]
+        [HttpGet("Profile")]
         [Authorize]
-        public async Task<IActionResult> StudentProfile()
+        public async Task<IActionResult> UserProfile()
         {
-            return Ok(await _userService.GetAuthStudentProfile());
-        }
-
-        [HttpGet("EmployerProfile")]
-        [Authorize]
-        public async Task<IActionResult> EmployerProfile()
-        {
-            return Ok(await _userService.GetAuthEmployerPofiles());
-        }
-
-
-        [HttpPost("Subscribe/{jobId}")]
-        [Authorize(Roles ="Employer" )]
-        public async Task<IActionResult> Subscribe([FromRoute] int jobId)
-        {
-            await _jobService.Subscribe(jobId);
-            return Ok();
+            return Ok(await _userService.GetAuthProfile());
         }
 
     }

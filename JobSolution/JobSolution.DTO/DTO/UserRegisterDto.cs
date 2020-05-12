@@ -15,6 +15,7 @@ namespace JobSolution.Domain.Entities
         public string ImagePath { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime? DateOfBirth { get; set; }
+        public string University { get; set; }
         
     }
 }

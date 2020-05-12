@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -27,20 +28,18 @@ namespace JobSolution.Services.Concrete
         }
 
         
-        public async Task<EmployerProfileDTO> GetAuthEmployerPofiles()
+        public async Task<ProfileDTO> GetAuthProfile()
         {
             var UserId = Convert.ToInt32(_context.HttpContext.User.Claims.Where(x => x.Type == "UserId").First().Value);
             var UserProfile = await _profileRepository.GetAuthUserProfile(UserId);
 
-            return _mapper.Map<EmployerProfileDTO>(UserProfile);         
-        }
-
-        public async  Task<StudentProfileDTO> GetAuthStudentProfile()
-        {
-            var UserId = Convert.ToInt32(_context.HttpContext.User.Claims.Where(x => x.Type == "UserId").First().Value);
-            var UserProfile = await _profileRepository.GetAuthUserProfile(UserId);
-
-            return _mapper.Map<StudentProfileDTO>(UserProfile);
+            try
+            {
+                byte[] b = File.ReadAllBytes(UserProfile.ImagePath);
+                UserProfile.ImagePath = "data:image/png;base64," + Convert.ToBase64String(b);
+            }
+            catch {}
+            return _mapper.Map<ProfileDTO>(UserProfile);         
         }
     }
 }
