@@ -15,9 +15,12 @@ namespace JobSolution.Repository.Concrete
     {
 
         private IServiceProvider _sp;
+        private Dictionary<int, bool> IsEmployerOnlineInGroup;
+
         public ChatRepository(IServiceProvider sp)
         {
             _sp = sp;
+            IsEmployerOnlineInGroup = new Dictionary<int, bool>();
         }
 
         public Task SendMessage(string jwt, int employerId, string message)
@@ -39,13 +42,23 @@ namespace JobSolution.Repository.Concrete
 
         public Task JoinRoom(int employerId, string jwt)
         {
-            if (IsUserEmployer(employerId, jwt)) Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
+            if (IsUserEmployer(employerId, jwt))
+            {
+                Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
+                IsEmployerOnlineInGroup.Add(employerId, true);
+            }
+            else if (IsEmployerOnlineInGroup.ContainsKey(employerId) && IsEmployerOnlineInGroup[employerId] == true) Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
+
             return Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
         }
 
         public Task LeaveRoom(int employerId, string jwt)
         {
-            if (IsUserEmployer(employerId, jwt)) Clients.Group(employerId.ToString()).SendAsync("OnEmployerOffline");
+            if (IsUserEmployer(employerId, jwt))
+            {
+                Clients.Group(employerId.ToString()).SendAsync("OnEmployerOffline");
+                IsEmployerOnlineInGroup[employerId] = false;
+            }
             return Groups.RemoveFromGroupAsync(Context.ConnectionId, employerId.ToString());
         }
 
