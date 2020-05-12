@@ -27,21 +27,45 @@ namespace JobSolution.Repository.Concrete
             var claims = token.Claims;
 
             string email = "";
-            int user_id = 0;
 
-            /// Parse user Data
+            /// Parse user Data fron JWT
             foreach (var item in claims)
             {
-                // Console.WriteLine(item.Type + ": " + item.Value);
                 if (item.Type == "email") email = item.Value;
-                if (item.Type == "UserId") user_id = Int32.Parse(item.Value);
-
             }
 
-            // Console.WriteLine("empl id=" + employerId.ToString() + " user_id=" + user_id);
+            return Clients.Group(employerId.ToString()).SendAsync("ReceiveMessage", email, IsUserEmployer(employerId, jwt), message);
+        }
+
+        public Task JoinRoom(int employerId, string jwt)
+        {
+            if (IsUserEmployer(employerId, jwt)) Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
+            return Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
+        }
+
+        public Task LeaveRoom(int employerId, string jwt)
+        {
+            if (IsUserEmployer(employerId, jwt)) Clients.Group(employerId.ToString()).SendAsync("OnEmployerOffline");
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, employerId.ToString());
+        }
+
+
+        public bool IsUserEmployer(int employerId, string jwt)
+        {
+
+            JwtSecurityToken token = new JwtSecurityToken(jwt);
+            var claims = token.Claims;
+            int user_id = 0;
+
+            /// Parse user Data fron JWT
+            foreach (var item in claims)
+            {
+                if (item.Type == "UserId") user_id = Int32.Parse(item.Value);
+            }
 
             bool isEmployer = false;
 
+            // Using Db
             using (var scope = _sp.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -49,27 +73,9 @@ namespace JobSolution.Repository.Concrete
 
                 if (current_job.UserId == user_id) isEmployer = true;
                 else isEmployer = false;
-
-                // Console.WriteLine("COUNT OF JOBS====" + dbContext.Jobs.ToList().Count.ToString());
             }
 
-            // Console.WriteLine("================================================");
-            // Console.WriteLine("Email: " + email + " is empl: " + isEmployer + " mess=" + message);
-
-            return Clients.Group(employerId.ToString()).SendAsync("ReceiveMessage", email, isEmployer, message);
-        }
-
-        public Task JoinRoom(int employerId)
-        {
-
-            Console.WriteLine("-------------------------conn" + employerId.ToString());
-            return Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
-        }
-
-        public Task LeaveRoom(int employerId)
-        {
-            Console.WriteLine("-------------------------desc" + employerId.ToString());
-            return Groups.RemoveFromGroupAsync(Context.ConnectionId, employerId.ToString());
+            return isEmployer;
         }
     }
 }
