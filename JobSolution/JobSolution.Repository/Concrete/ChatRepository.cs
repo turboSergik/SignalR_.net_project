@@ -59,17 +59,19 @@ namespace JobSolution.Repository.Concrete
             return Clients.Group(employerId.ToString()).SendAsync("ReceiveMessage", email, isEmployer, message);
         }
 
-        public Task JoinRoom(int employerId)
+        public Task JoinRoom(int workId, string jwt)
         {
+            jwt->user
+            user check employer?
 
-            Console.WriteLine("-------------------------conn" + employerId.ToString());
-            return Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
+            Clients.Group(workId.ToString()).SendAsync("OnEmployerJoin");
+            return Groups.AddToGroupAsync(Context.ConnectionId, workId.ToString());
         }
 
-        public Task LeaveRoom(int employerId)
+        public Task LeaveRoom(int workId, string jwt)
         {
-            Console.WriteLine("-------------------------desc" + employerId.ToString());
-            return Groups.RemoveFromGroupAsync(Context.ConnectionId, employerId.ToString());
+            Clients.Group(workId.ToString()).SendAsync("OnEmployerLeave");
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, workId.ToString());
         }
     }
 }

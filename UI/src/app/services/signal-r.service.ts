@@ -12,6 +12,12 @@ export class SignalRService {
     this.employerId = employerId
   }
 
+  /*
+    Func witch connecting with remote data provider from HOST_CHAT
+    Steps:
+      1. Connecting to data provider
+      2. Register into room with name == this.employerId
+   */
   public startConnection(): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(HOST_CHAT)
@@ -25,6 +31,9 @@ export class SignalRService {
       .catch(err => console.log(err))
   }
 
+  /*
+    Receive message event handler
+   */
   public onMessageReceived = (cb) => {
     this.hubConnection.on('ReceiveMessage', (...data) => {
       cb(data)
@@ -36,6 +45,13 @@ export class SignalRService {
     this.hubConnection.stop()
   }
 
+  /*
+    Send message func
+    'SendMessage' - function witch will be called on backend
+    localStorage.getItem('accessToken') - jwt witch be placed as 1 argument to func SendMessage
+    this.employerId - work identifier, 2 arg
+    message - user message, 3 arg
+   */
   public sendMessage(message: string): void {
     this.hubConnection.invoke('SendMessage', localStorage.getItem('accessToken'), this.employerId, message)
   }

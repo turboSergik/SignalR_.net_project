@@ -1,20 +1,3 @@
-/*.chat {*/
-/*}*/
-
-/*.chat__box {*/
-/*  position: fixed;*/
-/*  top: calc(100% - 530px);*/
-/*  width: 400px;*/
-/*  height: 500px;*/
-/*  z-index: 999;*/
-/*  transition: 0.3s;*/
-/*}*/
-
-/*.closed {*/
-/*  margin-top: 480px;*/
-/*  height: 20px;*/
-/*}*/
-
 .card__box-item {
   margin-top: 10px;
 }
@@ -24,8 +7,3 @@
   height: 350px;
   overflow: auto;
 }
-
-/*.cart__box-input {*/
-/*  width: 100%;*/
-/*  height: 30px;*/
-/*}*/

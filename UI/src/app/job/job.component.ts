@@ -56,6 +56,11 @@ export class JobComponent implements OnInit {
     });
   }
 
+  /*
+    if we click on chat button this func well be called
+    jobId - job identifier
+    we open new modal with chat component, provide jobId him
+   */
   openChat(jobId: number): void {
     const dialogRef = this.dialog.open(ChatComponent, {
       width: '600px',
