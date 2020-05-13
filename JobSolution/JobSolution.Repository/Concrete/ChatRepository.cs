@@ -22,7 +22,7 @@ namespace JobSolution.Repository.Concrete
             _sp = sp;
         }
 
-        public Task SendMessage(string jwt, int employerId, string message)
+        public Task SendMessage(string jwt, int jobId, string message)
         {
 
             JwtSecurityToken token = new JwtSecurityToken(jwt);
@@ -30,16 +30,17 @@ namespace JobSolution.Repository.Concrete
 
             string email = "";
 
-            /// Parse user Data fron JWT
+            // Parse user Data fron JWT
             foreach (var item in claims)
             {
                 if (item.Type == "email") email = item.Value;
             }
 
-            return Clients.Group(employerId.ToString()).SendAsync("ReceiveMessage", email, IsUserEmployer(employerId, jwt), message);
+            // Send message to all users in group
+            return Clients.Group(jobId.ToString()).SendAsync("ReceiveMessage", email, IsUserEmployer(jobId, jwt), message);
         }
 
-        public Task JoinRoom(int employerId, string jwt)
+        public Task JoinRoom(int jobId, string jwt)
         {
             Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
             if (IsUserEmployer(employerId, jwt))
@@ -47,25 +48,26 @@ namespace JobSolution.Repository.Concrete
                 Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
                 if (IsEmployerOnlineInGroup.ContainsKey(employerId)) IsEmployerOnlineInGroup[employerId] = true;
                 else IsEmployerOnlineInGroup.Add(employerId, true);
+==
             }
-            else if (IsEmployerOnlineInGroup.ContainsKey(employerId) && IsEmployerOnlineInGroup[employerId] == true) Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
+            else if (IsEmployerOnlineInGroup.ContainsKey(jobId) && IsEmployerOnlineInGroup[jobId] == true) Clients.Group(jobId.ToString()).SendAsync("OnEmployerOnline");
 
             return Task.FromResult<object>(null);
+=
         }
 
-        public Task LeaveRoom(int employerId, string jwt)
+        public Task LeaveRoom(int jobId, string jwt)
         {
-            Console.WriteLine("===================leave" + IsUserEmployer(employerId, jwt).ToString());
-            if (IsUserEmployer(employerId, jwt))
+            if (IsUserEmployer(jobId, jwt))
             {
-                Clients.Group(employerId.ToString()).SendAsync("OnEmployerOffline");
-                IsEmployerOnlineInGroup[employerId] = false;
+                Clients.Group(jobId.ToString()).SendAsync("OnEmployerOffline");
+                IsEmployerOnlineInGroup[jobId] = false;
             }
-            return Groups.RemoveFromGroupAsync(Context.ConnectionId, employerId.ToString());
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, jobId.ToString());
         }
 
 
-        public bool IsUserEmployer(int employerId, string jwt)
+        public bool IsUserEmployer(int jobId, string jwt)
         {
 
             JwtSecurityToken token = new JwtSecurityToken(jwt);
@@ -84,7 +86,7 @@ namespace JobSolution.Repository.Concrete
             using (var scope = _sp.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var current_job = dbContext.Jobs.FirstOrDefault(item => item.Id == employerId);
+                var current_job = dbContext.Jobs.FirstOrDefault(item => item.Id == jobId);
 
                 if (current_job.UserId == user_id) isEmployer = true;
                 else isEmployer = false;
