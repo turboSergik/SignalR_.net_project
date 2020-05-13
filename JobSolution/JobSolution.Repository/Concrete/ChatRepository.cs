@@ -15,6 +15,8 @@ namespace JobSolution.Repository.Concrete
     {
 
         private IServiceProvider _sp;
+
+        // Dict for check, online employer or no
         private static Dictionary<int, bool> IsEmployerOnlineInGroup = new Dictionary<int, bool>();
 
         public ChatRepository(IServiceProvider sp)
@@ -30,7 +32,7 @@ namespace JobSolution.Repository.Concrete
 
             string email = "";
 
-            // Parse user Data fron JWT
+            // Parse user Data from JWT
             foreach (var item in claims)
             {
                 if (item.Type == "email") email = item.Value;
@@ -42,18 +44,22 @@ namespace JobSolution.Repository.Concrete
 
         public Task JoinRoom(int jobId, string jwt)
         {
-            Groups.AddToGroupAsync(Context.ConnectionId, employerId.ToString());
-            if (IsUserEmployer(employerId, jwt))
+            // Add current people to chat
+            Groups.AddToGroupAsync(Context.ConnectionId, jobId.ToString());
+
+            if (IsUserEmployer(jobId, jwt))
             {
-                Clients.Group(employerId.ToString()).SendAsync("OnEmployerOnline");
-                if (IsEmployerOnlineInGroup.ContainsKey(employerId)) IsEmployerOnlineInGroup[employerId] = true;
-                else IsEmployerOnlineInGroup.Add(employerId, true);
-==
+                Clients.Group(jobId.ToString()).SendAsync("OnEmployerOnline");
+
+                // Set employer online in current chat
+                if (IsEmployerOnlineInGroup.ContainsKey(jobId)) IsEmployerOnlineInGroup[jobId] = true;
+                else IsEmployerOnlineInGroup.Add(jobId, true);
+
             }
             else if (IsEmployerOnlineInGroup.ContainsKey(jobId) && IsEmployerOnlineInGroup[jobId] == true) Clients.Group(jobId.ToString()).SendAsync("OnEmployerOnline");
 
             return Task.FromResult<object>(null);
-=
+
         }
 
         public Task LeaveRoom(int jobId, string jwt)
@@ -61,6 +67,8 @@ namespace JobSolution.Repository.Concrete
             if (IsUserEmployer(jobId, jwt))
             {
                 Clients.Group(jobId.ToString()).SendAsync("OnEmployerOffline");
+
+                // Set employer offline in current chat
                 IsEmployerOnlineInGroup[jobId] = false;
             }
             return Groups.RemoveFromGroupAsync(Context.ConnectionId, jobId.ToString());
@@ -74,7 +82,7 @@ namespace JobSolution.Repository.Concrete
             var claims = token.Claims;
             int user_id = 0;
 
-            /// Parse user Data fron JWT
+            // Parse user Data from JWT
             foreach (var item in claims)
             {
                 if (item.Type == "UserId") user_id = Int32.Parse(item.Value);
@@ -85,7 +93,10 @@ namespace JobSolution.Repository.Concrete
             // Using Db
             using (var scope = _sp.CreateScope())
             {
+                // Get Db context
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                // Request to Database
                 var current_job = dbContext.Jobs.FirstOrDefault(item => item.Id == jobId);
 
                 if (current_job.UserId == user_id) isEmployer = true;
