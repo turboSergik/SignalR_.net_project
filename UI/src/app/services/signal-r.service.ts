@@ -12,6 +12,12 @@ export class SignalRService {
     this.employerId = employerId
   }
 
+  /*
+    Func witch connecting with remote data provider from HOST_CHAT
+    Steps:
+      1. Connecting to data provider
+      2. Register into room with name == this.employerId
+   */
   public startConnection(): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(HOST_CHAT)
@@ -20,11 +26,26 @@ export class SignalRService {
     this.hubConnection
       .start()
       .then(() => {
-        this.hubConnection.invoke('JoinRoom', this.employerId)
+        this.hubConnection.invoke('JoinRoom', this.employerId, localStorage.getItem('accessToken'))
       })
       .catch(err => console.log(err))
   }
 
+  public onEmployerOnline = (cb) => {
+    this.hubConnection.on('OnEmployerOnline', (...data) => {
+      cb(data)
+    })
+  }
+
+  public onEmployerOffline = (cb) => {
+    this.hubConnection.on('OnEmployerOffline', (...data) => {
+      cb(data)
+    })
+  }
+
+  /*
+    Receive message event handler
+   */
   public onMessageReceived = (cb) => {
     this.hubConnection.on('ReceiveMessage', (...data) => {
       cb(data)
@@ -32,10 +53,17 @@ export class SignalRService {
   }
 
   public dropConnection(): void {
-    this.hubConnection.invoke('LeaveRoom', this.employerId)
-    this.hubConnection.stop()
+    this.hubConnection.invoke('LeaveRoom', this.employerId, localStorage.getItem('accessToken'))
+    // this.hubConnection.stop()
   }
 
+  /*
+    Send message func
+    'SendMessage' - function witch will be called on backend
+    localStorage.getItem('accessToken') - jwt witch be placed as 1 argument to func SendMessage
+    this.employerId - work identifier, 2 arg
+    message - user message, 3 arg
+   */
   public sendMessage(message: string): void {
     this.hubConnection.invoke('SendMessage', localStorage.getItem('accessToken'), this.employerId, message)
   }

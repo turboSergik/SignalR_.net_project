@@ -20,13 +20,18 @@ export class AdvertService {
   }
 
   popUp = new Subject();
+  added = new Subject();
 
   onPopup() {
     return this.popUp.asObservable();
   }
 
   onAddAdvert() {
-    return this.popUp.asObservable();
+    return this.added.asObservable();
+  }
+
+  getAdvertForStudent(filter: PaginatedRequest) : Observable<PagedResult<AdvertDTO>>{
+    return  this.http.post<PagedResult<AdvertDTO>>(`${URL_ADVERT}/Student/Adverts`, filter);
   }
 
   postStudentAdverts(advert: AdvertDTO): Observable<any> {
@@ -44,6 +49,9 @@ export class AdvertService {
   deleteAdvert(id: number): Observable<any> {
     return this.http.delete(`${URL_ADVERT}/${id}`);
   }
+
+
+
 
   getAdverts(): Observable<AdvertDTO[]> {
     return this.http.get<AdvertDTO[]>(`${URL_ADVERT}`);

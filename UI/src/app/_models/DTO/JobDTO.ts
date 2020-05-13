@@ -9,9 +9,10 @@ export interface JobDTO {
   city: string;
   publishedOn: Date;
   finishedOn: Date;
-  base64Photo: string;
+  imagePath: string;
   contact: string;
   salary: string;
   description: string;
   numberOfApplicants: number;
+  marked:number;// ?? boolean
 }

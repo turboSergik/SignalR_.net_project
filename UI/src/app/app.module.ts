@@ -45,7 +45,9 @@ import {UpdateAdvertComponent} from './advert/update-advert/update-advert.compon
 import {ReactiveFormsModule} from '@angular/forms';
 import {HomeComponent} from './home/home.component';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import { ViewJobComponent } from './home/view-job/view-job.component';
+import {ViewJobComponent} from './home/view-job/view-job.component';
+import {NgxPermissionsModule} from 'ngx-permissions';
+import { TopNavigationComponent } from './top-navigation/top-navigation.component';
 import { ChatComponent } from './chat/chat.component';
 
 @NgModule({
@@ -65,7 +67,8 @@ import { ChatComponent } from './chat/chat.component';
     UpdateAdvertComponent,
     HomeComponent,
     ViewJobComponent,
-    ChatComponent,
+    TopNavigationComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
@@ -98,6 +101,7 @@ import { ChatComponent } from './chat/chat.component';
     MatNativeDateModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
+    NgxPermissionsModule.forRoot()
   ],
   providers: [
     {

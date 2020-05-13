@@ -1,0 +1,10 @@
+.filter-options {
+  display: inline-block;
+  margin-left: 35px;
+  position: relative;
+  top: 4px;
+}
+
+::ng-deep .mat-form-field-wrapper {
+  padding-bottom: 0;
+}

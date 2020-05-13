@@ -1,0 +1,18 @@
+.user-options {
+  position: absolute;
+  right: 0;
+}
+
+img {
+  border-radius: 50%;
+}
+
+
+.user-thumbnail {
+  width: 35px;
+  height: 35px;
+  display: inline-block;
+  border-radius: 50px;
+  margin-left: 8px;
+  background-size: cover;
+}

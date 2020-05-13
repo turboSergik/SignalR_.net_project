@@ -14,8 +14,6 @@ export class SignInComponent {
   userName: string;
   password: string;
   token: string;
-  role: string;
-  decodedToken: any;
 
   constructor(private activatedRouter: ActivatedRoute,
               private router: Router,
@@ -31,8 +29,7 @@ export class SignInComponent {
         this.token = data.accessToken;
         this.auth.tokenObject = this.token;
         localStorage.setItem('accessToken', this.auth.tokenObject);
-        this.decodedToken = decode(this.auth.getToken());
-        this.role = this.decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        this.auth.setUserRole();
         this.router.navigate(['/profile']);
       });
   }

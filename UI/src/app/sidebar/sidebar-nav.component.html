@@ -2,11 +2,9 @@
   <mat-card-title>
     <p class=""></p>
   </mat-card-title>
+
+  <a mat-list-item routerLink=""><span class="material-icons">amp_stories</span>Home</a>
   <a mat-list-item routerLink="jobs"><span class="material-icons" style="color: white">apps</span>Jobs</a>
-  <a mat-list-item routerLink="profile" *ngIf="serviceAuth.isLoggedIn();">
-    <span class="material-icons" style="color: white">assignment_ind</span>
-    Profile
-  </a>
-  <a mat-list-item><span class="material-icons" (click)="onAddAdvert()">post_add</span>Add advert</a>
-  <button (click)="onAddAdvert()"></button>
+  <a mat-list-item routerLink="profile" *ngIf="serviceAuth.isLoggedIn();"><span class="material-icons" style="color: white">assignment_ind</span>My Profile</a>
+  <a mat-list-item routerLink="profile" (click)="onAddAdvert()" *ngxPermissionsOnly="['Student']"><span class="material-icons" >post_add</span>Add advert</a>
 </mat-nav-list>

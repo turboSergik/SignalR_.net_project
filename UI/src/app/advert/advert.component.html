@@ -1,9 +1,9 @@
-<div>
-  <h3>  My Announcements </h3>
+<div class="anouncements-heading">
+  <h3> My Announcements </h3>
 </div>
 
 <div matSort class="mat-elevation-z8">
-  <table mat-table [dataSource]="this.adverts" class="user-data-table">
+  <table mat-table [dataSource]="adverts" class="user-data-table">
   <ng-container matColumnDef="Title">
       <th mat-header-cell *matHeaderCellDef mat-sort-header > Title</th>
       <td mat-cell *matCellDef="let element"> {{element.title}} </td>

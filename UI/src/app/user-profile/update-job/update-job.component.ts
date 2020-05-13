@@ -1,12 +1,9 @@
-import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef,} from '@angular/material/dialog';
 import {JobService} from '../../_services/job.service';
-import {CategoryDTO} from '../../_models/DTO/CategoryDTO';
-import {CityDTO} from '../../_models/DTO/CityDTO';
 import {JobDTO} from '../../_models/DTO/JobDTO';
 import {AddJobData} from '../../_models/AddJobData';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {JobType} from '../../_models/JobType';
 
 
 @Component({
@@ -29,12 +26,12 @@ export class UpdateJobComponent implements OnInit {
     if (this.jobData.id) {
       this.jobService.getJobById(this.jobData.id).subscribe((job: JobDTO) => {
         this.job = job;
+        this.job.imagePath = '';
       });
     }
   }
 
   onJobAdd() {
-
     let formData: FormData = new FormData();
     formData.append('profileImage', this.profileImage);
     var postData = JSON.stringify(this.job);

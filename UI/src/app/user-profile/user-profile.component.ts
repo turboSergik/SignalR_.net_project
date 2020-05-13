@@ -14,6 +14,8 @@ import {FormControl} from '@angular/forms';
 import {Filter} from '../_models/Filter';
 import {FilterLogicalOperators} from '../_models/FilterLogicalOperators';
 import {JobType} from '../_models/JobType';
+import {NgxPermissionsService} from 'ngx-permissions';
+import {AdvertService} from '../_services/advert.service';
 
 
 @Component({
@@ -26,13 +28,16 @@ import {JobType} from '../_models/JobType';
 export class UserProfileComponent implements OnInit {
   searchInput = new FormControl('');
   filter = {} as PaginatedRequest;
-  displayedColumns: string[] = ['Id', 'Title', 'Category','City', 'Publish Date', 'Finish Date' , 'Contact','Actions'];
+  postedJobsColumns: string[] = ['Id', 'Title', 'Category', 'City', 'Publish Date', 'Finish Date', 'Contact', 'Actions'];
+  enrolledJobsColumns = ['Title', 'Category', 'City', 'Contact', 'PublishedOn', 'Description', 'Actions'];
 
   dialogRef: MatDialogRef<any>;
   jobsCategories = [] as CategoryDTO[];
   jobsCities = [] as CityDTO[];
   jobTypes = [] as JobType[];
   employerJobs = [] as JobDTO[];
+  studentEnrolledJobs = [] as JobDTO[];
+  sortFilters = [] as Filter[];
 
 
   paginationOptions = {
@@ -45,19 +50,31 @@ export class UserProfileComponent implements OnInit {
   orderingOptions = {
     titleOrder: 'asc',
     categoryOrder: 'asc',
-    cityOrder: "asc",
-    publishedOrder : "asc",
-    finishedOrder : "asc"
+    cityOrder: 'asc',
+    publishedOrder: 'asc',
+    finishedOrder: 'asc'
   };
 
-  constructor(private jobService: JobService, public authService : AuthService,
-               private toolBarService: ToolBarService,
-               public dialog: MatDialog, private popService : PopService) { }
+  constructor(private jobService: JobService,
+              private toolBarService: ToolBarService,
+              private permissionsService: NgxPermissionsService,
+              public dialog: MatDialog, private popService: PopService) {
+  }
 
   ngOnInit() {
     this.filter.pageSize = this.paginationOptions.pageSize;
     this.toolBarService.setTitle('Profile');
-    this.loadUserJobs();
+    this.permissionsService.permissions$
+      .subscribe((permissions: any) => {
+        switch (Object.keys(permissions)[0]) {
+          case 'Student':
+            this.loadStudentJobs();
+            break;
+          case 'Employer':
+            this.loadEmployerJobs();
+            break;
+        }
+      });
 
     this.jobService.getCategories().subscribe(data => {
       this.jobsCategories = data;
@@ -70,26 +87,33 @@ export class UserProfileComponent implements OnInit {
     this.jobService.getCity().subscribe(data => {
       this.jobsCities = data;
     });
-    this.popService.onPopup().subscribe((id:number) =>{
+    this.popService.onPopup().subscribe((id: number) => {
       this.onDelete(id);
     });
   }
 
-  loadUserJobs() {
-    this.jobService.getAllJobPaginatedUser(this.filter).subscribe(data => {
+  loadEmployerJobs() {
+    this.jobService.getAllJobPaginatedEmployer(this.filter).subscribe(data => {
       this.employerJobs = data.items;
       this.paginationOptions.length = data.total;
     });
   }
 
-  onPaginatorChange(pagination) {
 
+  loadStudentJobs() {
+    this.jobService.getAllJobPaginatedStudent(this.filter).subscribe(data => {
+      this.studentEnrolledJobs = data.items;
+      this.paginationOptions.length = data.total;
+    });
+  }
+
+  onPaginatorChange(pagination) {
     this.filter = {
       ...this.filter,
       pageSize: pagination.pageSize,
       pageIndex: pagination.pageIndex
     };
-    this.loadUserJobs();
+    this.loadEmployerJobs();
   }
 
   onUpdate(id?: number) {
@@ -103,52 +127,50 @@ export class UserProfileComponent implements OnInit {
     });
 
     this.dialogRef.afterClosed().subscribe(() => {
-      this.loadUserJobs();
+      this.loadEmployerJobs();
     });
   }
 
-   onDelete(id: number){
-       this.jobService.deleteJob(id).subscribe(() => { this.loadUserJobs(); });
-   }
-
-  onClickPopUp(id:number, title: string){
-     this.dialogRef = this.dialog.open(PopUpComponent, {
-       data: {
-         categories: this.jobsCategories,
-         cities: this.jobsCities,
-         id: id ? id : null,
-         jobTitle : title
-       }
-     });
+  onDelete(id: number) {
+    this.jobService.deleteJob(id).subscribe(() => {
+      this.loadEmployerJobs();
+    });
+    this.jobService.deleteEnrolledJobForStudent(id).subscribe( () => {this.loadStudentJobs(); console.log(id)});
   }
 
- filterByAttribute = (columnNameForSorting, order) => {
+  onClickPopUp(id: number, title: string) {
+    this.dialogRef = this.dialog.open(PopUpComponent, {
+      data: {
+        categories: this.jobsCategories,
+        cities: this.jobsCities,
+        id: id ? id : null,
+        jobTitle: title
+      }
+    });
+  }
+
+  filterByAttribute = (columnNameForSorting, order) => {
     this.filter.columnNameForSorting = columnNameForSorting;
     this.orderingOptions[order] = this.orderingOptions[order] == 'asc' ? 'desc' : 'asc';
     this.filter.sortDirection = this.orderingOptions[order];
+    this.loadEmployerJobs();
+  };
 
-    this.jobService.getAllJobPaginatedUser(this.filter).subscribe(data => {
-        this.employerJobs = data.items;
-   });
-  }
-
-  createFilterFromSearchInput(){
+  onSearch() {
     const filterValue = this.searchInput.value.trim();
-    console.log(filterValue);
-    if(filterValue){
-      var filters: Filter[] = [];
-      const filter: Filter = {value: filterValue, path : 'title'};
-      filters.push(filter);
-
+    if (filterValue) {
+      this.sortFilters = [
+        {
+          value: filterValue,
+          path: 'title'
+        }
+      ];
     }
     this.filter.requestFilters = {
-      logicalOperator : FilterLogicalOperators.And,
-      filters : filters
+      logicalOperator: FilterLogicalOperators.And,
+      filters: this.sortFilters
     };
-    this.jobService.getAllJobPaginatedUser(this.filter).subscribe(data => {
-      this.employerJobs = data.items;
-    });
-    console.log(this.filter);
+    this.loadEmployerJobs();
+    this.sortFilters = [];
   }
-
 }

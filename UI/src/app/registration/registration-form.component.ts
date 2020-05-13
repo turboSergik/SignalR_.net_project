@@ -13,30 +13,41 @@ import {Router} from '@angular/router';
 export class RegistrationFormComponent implements OnInit {
 
   roles: string[] = ['Employer', 'Student'];
+  registeredUser = {} as RegisterUserModel;
+  token: string;
+  uploadFileName: string;
+  profileImage: File = null;
 
   constructor(private authService: AuthService,
               private router: Router,
               private toolBarService: ToolBarService) {
   }
 
-  registeredUser = {} as RegisterUserModel;
-  token: string;
-
-  onSubmit() {
-    this.register();
-  }
-
   ngOnInit(): void {
     this.toolBarService.setTitle('Register');
   }
 
-  register() {
-    this.authService.registration(this.registeredUser)
+
+  onSubmit() {
+    let formData: FormData = new FormData();
+    formData.append('profileImage', this.profileImage);
+    var postData = JSON.stringify(this.registeredUser);
+    formData.append("postData",postData );
+    console.log(formData);
+    this.register(formData);
+  }
+
+  register(form : FormData) {
+    this.authService.registrationFormData(form)
       .subscribe(data => {
         this.token = data.accessToken;
         this.authService.tokenObject = this.token;
         localStorage.setItem('accessToken', this.authService.tokenObject);
         this.router.navigate(['/profile']);
       });
+  }
+  onUploadImage(file) {
+    this.profileImage = <File>file.target.files[0];
+    this.uploadFileName = file.target.files[0].type.indexOf("image") !== -1 ? file.target.files[0].name : '';
   }
 }

@@ -1,0 +1,49 @@
+<mat-toolbar>
+  <span *ngIf="authService.isLoggedIn() && !isHome">{{this.title}}</span>
+  <ng-container *ngIf="!authService.isLoggedIn()">
+    <button mat-button routerLink="/">
+      Home
+    </button>
+    <button mat-button routerLink="/jobs">
+      All jobs
+    </button>
+    <button mat-button routerLink="sign-in">
+      <span class="material-icons">account_box</span>
+      Login
+    </button>
+    <button mat-button routerLink="register">
+      <span class="material-icons">account_box</span>
+      Register
+    </button>
+  </ng-container>
+
+  <ng-container *ngIf="authService.isLoggedIn() && isHome">
+    <button mat-button routerLink="/">
+      Home
+    </button>
+    <button mat-button routerLink="/jobs">
+      All jobs
+    </button>
+    <button mat-button routerLink="/profile">
+      <span class="material-icons">account_box</span>
+      Profile
+    </button>
+  </ng-container>
+
+  <ng-container *ngxPermissionsOnly="['Employer','Student']">
+    <div class="user-options" *ngIf="loggedUser.fullName">
+      <button mat-button [matMenuTriggerFor]="userSettings">
+        {{loggedUser.fullName}}
+        <span class="user-thumbnail" [ngStyle]="{'background-image':'url(' + loggedUser.imagePath + ')'}"></span>
+      </button>
+      <mat-menu #userSettings="matMenu">
+        <button mat-menu-item>
+          Edit Profile
+        </button>
+        <button mat-menu-item (click)="authService.logout()">
+          LogOut
+        </button>
+      </mat-menu>
+    </div>
+  </ng-container>
+</mat-toolbar>

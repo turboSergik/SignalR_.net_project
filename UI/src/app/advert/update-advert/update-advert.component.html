@@ -23,5 +23,8 @@
     <mat-label>Contact</mat-label>
     <input [(ngModel)]="this.advert.contact" matInput>
   </mat-form-field>
-  <button mat-raised-button color="primary" (click)="AddAdvert(this.advert)">ADD ADVERT</button>
+  <button mat-raised-button color="primary"
+          (click)="advert.advertId ? UpdateAdvert(this.advert.advertId) : AddAdvert()">
+    {{advert.advertId ? 'Update' : 'Add'}} Advert
+  </button>
 </div>

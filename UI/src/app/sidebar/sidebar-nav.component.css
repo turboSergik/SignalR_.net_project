@@ -49,3 +49,7 @@ body {
   color: white;
   padding-left: 15px;
 }
+
+a .material-icons{
+  padding-right: 8px;
+}

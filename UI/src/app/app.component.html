@@ -1,46 +1,14 @@
 <mat-drawer-container class="app-main-container">
-  <mat-drawer mode="side" [opened]="authService.isLoggedIn()">
+  <mat-drawer
+    mode="side"
+    [opened]="authService.isLoggedIn() && !isHome">
     <app-sidebar-nav></app-sidebar-nav>
   </mat-drawer>
   <mat-drawer-content>
-    <mat-toolbar>
-      <span *ngIf="authService.isLoggedIn()">{{this.title}}</span>
-      <ng-container *ngIf="!authService.isLoggedIn()">
-        <button mat-button routerLink="/">
-          Home
-        </button>
-        <button mat-button routerLink="/jobs">
-          All jobs
-        </button>
-        <button mat-button routerLink="sign-in">
-          <span class="material-icons">account_box</span>
-          Login
-        </button>
-        <button mat-button routerLink="register">
-          <span class="material-icons">account_box</span>
-          Register
-        </button>
-      </ng-container>
-      <ng-container *ngIf="authService.isLoggedIn()">
-        <div class="user-options" *ngIf="loggedUser.fullName">
-          <button mat-button [matMenuTriggerFor]="userSettings" >
-            {{loggedUser.fullName}}
-            <span class="material-icons">account_box</span>
-          </button>
-          <mat-menu #userSettings="matMenu">
-            <button mat-menu-item>
-              Edit Profile
-            </button>
-            <button mat-menu-item>
-              Settings
-            </button>
-            <button mat-menu-item (click)="authService.logout()">
-              LogOut
-            </button>
-          </mat-menu>
-        </div>
-      </ng-container>
-    </mat-toolbar>
+    <app-top-navigation
+      [title]="title"
+      [isHome]="isHome">
+    </app-top-navigation>
     <div class="main-content">
       <router-outlet></router-outlet>
     </div>

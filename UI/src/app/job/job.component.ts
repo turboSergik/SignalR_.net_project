@@ -7,8 +7,6 @@ import {PaginatedRequest} from '../_models/PaginatedRequest';
 import {ActivatedRoute, Params} from '@angular/router';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {MatDialog} from '@angular/material/dialog';
-import {ChatComponent} from '../chat/chat.component';
 
 
 @Component({
@@ -20,12 +18,12 @@ import {ChatComponent} from '../chat/chat.component';
 export class JobComponent implements OnInit {
   pageOptions = [1, 2, 3, 4, 5];
   jobsTypeId: number;
+  currentJob: number = 1;
   filter = {} as PaginatedRequest;
   allJobs: JobDTO[];
 
 
-  constructor(public dialog: MatDialog,
-              private jobService: JobService,
+  constructor(private jobService: JobService,
               private toolBarService: ToolBarService,
               route: ActivatedRoute) {
     route.params.subscribe((params: Params) => {
@@ -37,6 +35,7 @@ export class JobComponent implements OnInit {
     this.toolBarService.setTitle('Jobs');
     this.filter.pageSize = 100;
     this.jobsTypeId ? this.loadJobsByTypeId(this.jobsTypeId) : this.loadJobs();
+
   }
 
   onFiltered(filter: PaginatedRequest) {
@@ -44,24 +43,31 @@ export class JobComponent implements OnInit {
     this.loadJobs();
   }
 
+  onSearch(requestFilters) {
+    this.filter.requestFilters = requestFilters;
+    this.loadJobs();
+  }
+
   loadJobsByTypeId(id: number) {
-    this.jobService.getJobsByType(this.filter, id).subscribe( data => {
+    this.jobService.getJobsByType(this.filter, id).subscribe(data => {
       this.allJobs = data.items;
     });
   }
 
   loadJobs() {
     this.jobService.getAllJobPaginated(this.filter).subscribe(data => {
-      this.allJobs = data.items;
+      this.allJobs = data.items.map((item) => {
+        item.imagePath = item.imagePath !== ''
+          ? item.imagePath
+          : 'https://www.northcliftonestates.ca/wp-content/uploads/2019/06/placeholder-images-image_large.png';
+        return item;
+      });
+      console.log(this.allJobs);
     });
   }
 
-  openChat(jobId: number): void {
-    const dialogRef = this.dialog.open(ChatComponent, {
-      width: '600px',
-      height: '500px',
-      data: jobId
-    });
+  jobChatRequest(jobId: number): void {
+    this.currentJob = jobId;
   }
 }
 

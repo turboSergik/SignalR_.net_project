@@ -7,9 +7,7 @@ import {UpdateAdvertComponent} from './update-advert/update-advert.component';
 import {JobService} from '../_services/job.service';
 import {CategoryDTO} from '../_models/DTO/CategoryDTO';
 import {CityDTO} from '../_models/DTO/CityDTO';
-import {FormControl} from '@angular/forms';
 import {PaginatedRequest} from '../_models/PaginatedRequest';
-import {log} from 'util';
 
 @Component({
   selector: 'app-advert',
@@ -18,10 +16,11 @@ import {log} from 'util';
 })
 export class AdvertComponent implements OnInit {
 
-  columnsToDisplay = ['Title','Category', 'City','Contact', 'PublishedOn','Description', 'Actions'];
-  searchInput = new FormControl('');
+  columnsToDisplay = ['Title', 'Category', 'City', 'Contact', 'PublishedOn', 'Description', 'Actions'];
   filter = {} as PaginatedRequest;
-  constructor(private advertService: AdvertService,public dialog: MatDialog, private jobService: JobService) { }
+
+  constructor(private advertService: AdvertService, public dialog: MatDialog, private jobService: JobService) {
+  }
 
   adverts = [] as AdvertDTO[];
   dialogRef: MatDialogRef<any>;
@@ -30,32 +29,37 @@ export class AdvertComponent implements OnInit {
 
 
   ngOnInit(): void {
-
-    this.jobService.getCategories().subscribe(data =>{this.Categories = data;});
-    this.jobService.getCity().subscribe(data =>{this.Cities = data;});
-
-
-        this.advertService.onPopup().subscribe((id:number) =>{
-          this.onDelete(id);
-        });
-          // ascult evenimentul ???
-        this.advertService.onAddAdvert().subscribe(() => {this.loadAdverts();});
-        this.loadAdverts();
+    this.filter.pageSize = 10;
+    this.jobService.getCategories().subscribe(data => {
+      this.Categories = data;
+    });
+    this.jobService.getCity().subscribe(data => {
+      this.Cities = data;
+    });
+    this.loadAdverts();
+    this.advertService.popUp.subscribe((id: number) => {
+      id && this.onDelete(id);
+      this.loadAdverts();
+    })
   }
 
-  loadAdverts(){
-    this.advertService.getAdverts().subscribe(data => {this.adverts = data});
+  loadAdverts() {
+    this.advertService.getAdvertForStudent(this.filter).subscribe(data => {
+      this.adverts = data.items;
+    });
   }
 
-  onDelete(id:number){
-    this.advertService.deleteAdvert(id).subscribe();
+  onDelete(id: number) {
+    this.advertService.deleteAdvert(id).subscribe(() => {
+      this.loadAdverts();
+    });
   }
 
-  openPopUp(id :number, AddName : string){
+  openPopUp(id: number, addName: string) {
     this.dialogRef = this.dialog.open(PopUpAdvertComponent, {
       data: {
         id: id ? id : null,
-        name : AddName
+        title: addName
       }
     });
   }
@@ -64,11 +68,14 @@ export class AdvertComponent implements OnInit {
     this.dialogRef = this.dialog.open(UpdateAdvertComponent, {
       data: {
         id: id ? id : null,
-        categories : this.Categories,
+        categories: this.Categories,
         cities: this.Cities
       },
-
     });
-    console.log(this.adverts);
+
+
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.loadAdverts();
+    });
   }
 }

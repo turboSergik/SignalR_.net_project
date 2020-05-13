@@ -33,6 +33,8 @@
 
 .jobs-results {
   display: inline-block;
+  padding-top: 20px;
+  width: 100%;
 }
 
 .jop-post:nth-child(3n+1) {
@@ -50,4 +52,35 @@
 .field_length{
   width: 80%;
   position: center;
+}
+
+.job-content {
+  width: 100%;
+  display: inline-block;
+}
+
+.left-content {
+  width: 60%;
+  float: left;
+}
+.right-content {
+  width: 40%;
+  float: left;
+}
+
+
+.post-thumbnail {
+  width: 100%;
+  height: 200px;
+  display: inline-block;
+  background-size: cover;
+  background-position: center center;
+}
+
+::ng-deep .mat-card-title {
+  padding: 0 20px;
+}
+
+::ng-deep .right-content .mat-list-base .mat-list-item {
+  height: 30px !important;
 }

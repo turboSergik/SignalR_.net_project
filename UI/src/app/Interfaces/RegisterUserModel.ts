@@ -5,6 +5,7 @@ export class RegisterUserModel{
     public Email:string
     public RoleFromRegister : string
     public Password:string;
-    // photo shoud to be also
+    public ImagePath : string;
+    public PhoneNumber:string;
 }
 
